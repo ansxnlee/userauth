@@ -4,11 +4,12 @@ import { createHash } from 'node:crypto';
 
 import { DI } from '../server';
 import { UserEntity } from '../entities/UserEntity';
+import { COOKIE_NAME } from '../utils/constants';
 
 export const getUsers = async (_req: Request, res: Response) => {
   try {
     const users = await DI.userRepository.findAll({
-      orderBy: {id: QueryOrder.DESC },
+      orderBy: {id: QueryOrder.ASC },
       limit: 20,
     });
     return res.status(200).json(users);
@@ -46,13 +47,46 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const user = await DI.userRepository.findOne(req.params.id as FilterQuery<UserEntity>, {});
+    const user = await DI.userRepository.findOne({ username: req.body.username });
     if(!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     await DI.userRepository.removeAndFlush(user);
     return res.status(200).json(user);
   } catch(e: any) {
-    return res.status(400).json({ message: e.message});
+    return res.status(400).json({ message: e.message });
+  }
+}
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const user = await DI.userRepository.findOne({ username: req.body.username });
+    if(!user) {
+      return res.status(404).json({ message: 'User does not exist' });
+    }
+    // verify entered password
+    const hashedPassword = createHash('sha256').update(req.body.password).digest('hex');
+    if(hashedPassword != user.password) {
+      return res.status(400).json({ message: 'Invalid password' });
+    }
+    req.session.userid = String(user.id);
+    return res.status(200).json("successfully logged as user: " + user.username);
+  } catch(e: any) {
+    return res.status(400).json({ message: e.message });
+  }
+}
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    req.session.destroy((err) => {
+      if(err) {
+        console.log(err);
+        return;
+      }
+      res.clearCookie(COOKIE_NAME);
+      return res.status(200).json("successfully deleted session cookie");
+    })
+  } catch(e: any) {
+    return res.status(400).json({ message: e.message })
   }
 }

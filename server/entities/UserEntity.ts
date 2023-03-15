@@ -6,7 +6,7 @@ export class UserEntity extends BaseEntity {
   @Property()
   username: string;
 
-  @Property()
+  @Property({ hidden: true })
   password: string;
 
   constructor(username: string, password: string) {
