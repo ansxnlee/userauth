@@ -18,11 +18,14 @@ some security concerns
 ---
 hijacking - malicious user discovers an active session and disguises as a target user
 > MITM prevented by using SSL/TLS (cookies are only transmitted on secure connections)
+
 > XSS mitigated by enabling HTTP-only cookies for sessions
+
 > reduce chance of weak entropy attacks by regenerating ID upon user login
 
 csrf - target user's session gets tricked into doing something for a malicious user
 > use same-site cookies
+
 > don't use GET requests to mutate data and regen sessionID as needed
 
 session tampering - malicious user is able to manupulate session data
