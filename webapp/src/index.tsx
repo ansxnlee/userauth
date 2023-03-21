@@ -5,14 +5,26 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import './index.css';
-import App from './views/App';
+import { App } from './views/App';
+import { Register } from './views/Register';
+import { Login } from './views/Login';
+import { Error } from './views/Error';
 import reportWebVitals from './reportWebVitals';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />
+    element: <App />,
+    errorElement: <Error />
   },
+  {
+    path: '/register',
+    element: <Register />
+  },
+  {
+    path: '/login',
+    element: <Login />
+  }
 ]);
 
 const root = ReactDOM.createRoot(

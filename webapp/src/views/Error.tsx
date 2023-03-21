@@ -1,14 +1,13 @@
-import React from 'react';
 import { ViewContainer, BodyContainer } from '../components/Containers';
 import { Navbar } from '../components/Navbar';
 
-export const App = () => {
+export const Error = () => {
   return (
     <ViewContainer>
       <Navbar />
       <BodyContainer>
-        dashboard page
-      </BodyContainer> 
+        404 Page Not Found
+      </BodyContainer>
     </ViewContainer>
-  );
+  )
 }
