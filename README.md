@@ -1,6 +1,6 @@
 # userauth
 
-Sandbox for restricting API requests to authorized users with session cookies. Webapp demonstrates additional usage for sessions data to remember user actions which can provide a better user experience.
+Sandbox for restricting API requests to authorized users with session cookies.
 
 technologies
 ---
