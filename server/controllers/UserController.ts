@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { FilterQuery, QueryOrder, wrap } from '@mikro-orm/core';
 import { createHash } from 'node:crypto';
 
-import { DI } from '../server';
+import { DI, RDS } from '../server';
 import { UserEntity } from '../entities/UserEntity';
 import { COOKIE_NAME } from '../utils/constants';
 
@@ -70,7 +70,8 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid password' });
     }
     req.session.userid = String(user.id);
-    return res.status(200).json("successfully logged as user: " + user.username);
+    req.session.username = user.username;
+    return res.status(200).json({ message: "successfully logged as user: " + user.username });
   } catch(e: any) {
     return res.status(400).json({ message: e.message });
   }
@@ -84,8 +85,21 @@ export const logout = async (req: Request, res: Response) => {
         return;
       }
       res.clearCookie(COOKIE_NAME);
-      return res.status(200).json("successfully deleted session cookie");
+      return res.status(200).json({ message: "successfully deleted session cookie" });
     })
+  } catch(e: any) {
+    return res.status(400).json({ message: e.message })
+  }
+}
+
+export const sessionCheck = async (req: Request, res: Response) => {
+  try {
+    const sessObj = {
+      response: 0,
+      username: req.session.username,
+    }
+    sessObj.response = await RDS.client.exists("sess:" + req.session.id);
+    return res.status(200).json(sessObj);
   } catch(e: any) {
     return res.status(400).json({ message: e.message })
   }

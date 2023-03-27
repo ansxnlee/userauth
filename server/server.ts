@@ -11,7 +11,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import mikroconfig from './mikro-orm.config';
 import RedisStore from 'connect-redis'
 import session from 'express-session';
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 import { UserEntity } from './entities/UserEntity';
 import { UserRouter } from './routes/UserRouter';
 import { 
@@ -22,21 +22,29 @@ import {
   COOKIE_MAX_AGE
 } from './utils/constants';
 
+// dependency injection container to reuse mikroORM instances
 export const DI = {} as {
-  server: http.Server;
+  server: http.Server,
   orm: MikroORM,
   em: EntityManager,
   userRepository: EntityRepository<UserEntity>,
 }
 
-// extending session types with my own as needed
+// allow controllers to execute redis commands programically
+export let RDS = {} as {
+  client: RedisClientType;
+}
+
+// extend session types with custom properties as needed
 declare module 'express-session' {
   interface SessionData {
     userid: String;
+    username: String;
   }
 }
 
-export const app = express(); // server is exposed for the router
+// server is exposed for express router to work
+export const app = express(); 
 
 export const main = (async () => {
   // mikroORM dependency injection setup
@@ -51,16 +59,17 @@ export const main = (async () => {
   // cors options setup
   const corsOptions = {
     origin: CORSORIGIN,
+    credentials: true,
     optionsSuccessStatus: 200
   }
   app.use(cors(corsOptions));
 
   // redis client setup
-  const redisClient = createClient();
-  redisClient.connect().catch(console.error);
+  RDS.client = createClient();
+  RDS.client.connect().catch(console.error);
   // pretty sure somethings wrong with RedisStore's type in '@types/connect-redis' here
   const redisStore = new (RedisStore as any)({
-    client: redisClient,
+    client: RDS.client,
     disableTouch: true, // timer doesn't get refreshed upon interaction
   })
   // cookie settings

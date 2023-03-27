@@ -5,13 +5,15 @@ import {
   createUser,
   deleteUser,
   login,
-  logout
+  logout,
+  sessionCheck
 } from '../controllers/UserController';
 import { isAuthed } from '../utils/isAuthed';
 
 export const UserRouter = express.Router();
 
 UserRouter.delete('/', deleteUser);
+UserRouter.get('/conninfo', sessionCheck);
 UserRouter.get('/:id', getUser);
 UserRouter.get('/', getUsers);
 UserRouter.post('/login', login);

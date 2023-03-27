@@ -21,3 +21,14 @@ export const BodyContainer = styled.div`
   justify-content: center;
   color: ${COLORS.text};
 `;
+
+export const FullContainer = styled.div`
+  background-color: ${COLORS.bg};
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: ${COLORS.text};
+`;
